@@ -46,12 +46,12 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 1 — Backend Skeleton
 
-- [ ] Spring Initializr: Web, Security, JPA, Validation, Flyway, PostgreSQL Driver, Lombok
-- [ ] `docker-compose.yml` with PostgreSQL for local development
-- [ ] Flyway migration `V1__init.sql`: `users` and `applications` tables
-- [ ] Entity → Repository → Service → Controller for `Application` (CRUD)
-- [ ] DTOs with MapStruct mappers — no entities exposed through the API
-- [ ] Global `@RestControllerAdvice` with a consistent error response format
+- [x] Spring Initializr: Web, Security, JPA, Validation, Flyway, PostgreSQL Driver, Lombok
+- [x] `docker-compose.yml` with PostgreSQL for local development
+- [x] Flyway migration `V1__init.sql`: `users` and `applications` tables
+- [x] Entity → Repository → Service → Controller for `Application` (CRUD)
+- [x] DTOs with MapStruct mappers — no entities exposed through the API
+- [x] Global `@RestControllerAdvice` with a consistent error response format
 - [ ] Swagger UI via springdoc-openapi
 
 ### Phase 2 — Authentication

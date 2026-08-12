@@ -1,5 +1,8 @@
 package com.jobtracker.application;
 
+import com.jobtracker.application.dto.ApplicationRequest;
+import com.jobtracker.application.dto.ApplicationResponse;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,10 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * CRUD endpoints for applications.
- * <p>
- * Phase 1.4 exposes the entity directly; Phase 1.5 introduces request/response
- * DTOs and validation so entities never cross the API boundary.
+ * CRUD endpoints for applications. Requests and responses are DTOs;
+ * validation is enforced with {@code @Valid} and reported by the global advice.
  */
 @RestController
 @RequestMapping("/api/applications")
@@ -31,24 +32,24 @@ public class ApplicationController {
     }
 
     @GetMapping
-    public Page<Application> list(Pageable pageable) {
+    public Page<ApplicationResponse> list(Pageable pageable) {
         return service.list(pageable);
     }
 
     @GetMapping("/{id}")
-    public Application get(@PathVariable Long id) {
+    public ApplicationResponse get(@PathVariable Long id) {
         return service.get(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Application create(@RequestBody Application application) {
-        return service.create(application);
+    public ApplicationResponse create(@Valid @RequestBody ApplicationRequest request) {
+        return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public Application update(@PathVariable Long id, @RequestBody Application application) {
-        return service.update(id, application);
+    public ApplicationResponse update(@PathVariable Long id, @Valid @RequestBody ApplicationRequest request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
