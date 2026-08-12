@@ -39,7 +39,7 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 0 — Setup
 
-- [ ] Create repository and folder structure: `backend`, `frontend`, `docker`
+- [x] Create repository and folder structure: `backend`, `frontend`, `docker`
 - [ ] Design the database schema: `User`, `Application`, `Company`, `StatusHistory`, `Note`
 - [ ] Draft this README (keep it updated as the project grows, not at the end)
 - [ ] Configure `.editorconfig`, `.gitignore` files, and a commit convention
