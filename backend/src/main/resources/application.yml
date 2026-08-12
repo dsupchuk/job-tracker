@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: jobtracker
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/jobtracker}
+    username: ${SPRING_DATASOURCE_USERNAME:jobtracker}
+    password: ${SPRING_DATASOURCE_PASSWORD:jobtracker}
+
+  jpa:
+    hibernate:
+      # Flyway owns the schema — never let Hibernate mutate it.
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8080
