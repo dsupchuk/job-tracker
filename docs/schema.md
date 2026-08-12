@@ -42,6 +42,8 @@ erDiagram
         date applied_at
         date deadline
         text tech_stack
+        timestamptz created_at
+        timestamptz updated_at
     }
     status_history {
         bigint id PK
@@ -100,6 +102,8 @@ The core entity — one job application.
 | `applied_at` | `date` | | null while still `SAVED` |
 | `deadline` | `date` | | application deadline |
 | `tech_stack` | `text` | | comma-separated for now; may become a join table later |
+| `created_at` | `timestamptz` | NOT NULL, default `now()` | set on insert (`@CreationTimestamp`) |
+| `updated_at` | `timestamptz` | NOT NULL, default `now()` | bumped on every update (`@UpdateTimestamp`) |
 
 ### `status_history`
 Append-only audit trail — one row per status transition.
@@ -160,3 +164,21 @@ SAVED → APPLIED → SCREENING → INTERVIEW → OFFER
 - **Flyway owns the schema.** JPA runs with `ddl-auto: validate`; structural changes go through versioned migrations (`V1__init.sql`, `V2__users_auth.sql`, ...).
 - **`status_history` is append-only.** It exists to compute "average time in each status" for the analytics dashboard (Phase 9).
 - **`tech_stack` starts denormalized** as comma-separated text; promote to a `tags` / join table only if querying by individual technology becomes necessary.
+
+---
+
+## Implementation status
+
+This document describes the **target** design. It is built incrementally through Flyway migrations, so the live schema is a subset until later phases land.
+
+| Table / column | Migration | Status |
+|---|---|---|
+| `users` (`id`, `email`, `password_hash`, `created_at`) | `V1__init.sql` | ✅ implemented |
+| `applications` (core columns + `created_at`, `updated_at`) | `V1__init.sql` | ✅ implemented |
+| `users.role`, unique index on `users.email` | `V2` (Phase 2) | ⏳ planned |
+| `applications.user_id` (ownership FK) | `V2` (Phase 2) | ⏳ planned |
+| `companies`, `applications.company_id` | later phase | ⏳ planned |
+| `status_history` | Phase 5 | ⏳ planned |
+| `notes` | later phase | ⏳ planned |
+
+Because ownership (`user_id`) arrives in Phase 2, the Phase 1 `applications` table has **no `user_id` column yet** — the CRUD API is currently unscoped and guarded by a temporary permit-all security config.
