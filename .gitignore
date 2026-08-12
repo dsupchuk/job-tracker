@@ -1,0 +1,13 @@
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Local planning notes (not part of the public repo)
+PLAN.md
