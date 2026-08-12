@@ -175,10 +175,10 @@ This document describes the **target** design. It is built incrementally through
 |---|---|---|
 | `users` (`id`, `email`, `password_hash`, `created_at`) | `V1__init.sql` | ✅ implemented |
 | `applications` (core columns + `created_at`, `updated_at`) | `V1__init.sql` | ✅ implemented |
-| `users.role`, unique index on `users.email` | `V2` (Phase 2) | ⏳ planned |
-| `applications.user_id` (ownership FK) | `V2` (Phase 2) | ⏳ planned |
+| `users.role`, unique index on `users.email` | `V2__users_auth.sql` | ✅ implemented |
+| `applications.user_id` (ownership FK) | `V2__users_auth.sql` | ✅ implemented |
 | `companies`, `applications.company_id` | later phase | ⏳ planned |
 | `status_history` | Phase 5 | ⏳ planned |
 | `notes` | later phase | ⏳ planned |
 
-Because ownership (`user_id`) arrives in Phase 2, the Phase 1 `applications` table has **no `user_id` column yet** — the CRUD API is currently unscoped and guarded by a temporary permit-all security config.
+Ownership is enforced: every application belongs to a user (`applications.user_id`, FK → `users`, `ON DELETE CASCADE`), and the API filters every query by the authenticated user, returning `404` for other users' rows.

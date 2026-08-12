@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Business logic for applications. Controllers stay thin and delegate here.
- * All input/output crosses the boundary as DTOs — entities never leak out.
+ * Business logic for applications. Every operation is scoped to the owning user;
+ * accessing another user's application yields 404 (not 403) so ids can't be
+ * enumerated.
  */
 @Service
 @Transactional
@@ -25,35 +26,36 @@ public class ApplicationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ApplicationResponse> list(Pageable pageable) {
-        return repository.findAll(pageable).map(mapper::toResponse);
+    public Page<ApplicationResponse> list(Long userId, Pageable pageable) {
+        return repository.findByUserId(userId, pageable).map(mapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public ApplicationResponse get(Long id) {
-        return mapper.toResponse(findOrThrow(id));
+    public ApplicationResponse get(Long userId, Long id) {
+        return mapper.toResponse(findOwnedOrThrow(userId, id));
     }
 
-    public ApplicationResponse create(ApplicationRequest request) {
-        Application saved = repository.save(mapper.toEntity(request));
-        return mapper.toResponse(saved);
+    public ApplicationResponse create(Long userId, ApplicationRequest request) {
+        Application application = mapper.toEntity(request);
+        application.setUserId(userId);
+        return mapper.toResponse(repository.save(application));
     }
 
-    public ApplicationResponse update(Long id, ApplicationRequest request) {
-        Application existing = findOrThrow(id);
+    public ApplicationResponse update(Long userId, Long id, ApplicationRequest request) {
+        Application existing = findOwnedOrThrow(userId, id);
         mapper.update(request, existing);
         return mapper.toResponse(existing); // flushed on commit (managed entity)
     }
 
-    public void delete(Long id) {
-        if (!repository.existsById(id)) {
+    public void delete(Long userId, Long id) {
+        if (!repository.existsByIdAndUserId(id, userId)) {
             throw ResourceNotFoundException.of("Application", id);
         }
         repository.deleteById(id);
     }
 
-    private Application findOrThrow(Long id) {
-        return repository.findById(id)
+    private Application findOwnedOrThrow(Long userId, Long id) {
+        return repository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> ResourceNotFoundException.of("Application", id));
     }
 }

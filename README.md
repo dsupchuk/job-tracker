@@ -56,10 +56,10 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 2 — Authentication
 
-- [ ] JWT endpoints: `POST /auth/register`, `/auth/login`, `/auth/refresh`
-- [ ] `SecurityFilterChain` with `USER` and `ADMIN` roles
-- [ ] Ownership checks — users can only access their own applications
-- [ ] Seed script with a demo user and ~20 sample applications
+- [x] JWT endpoints: `POST /auth/register`, `/auth/login`, `/auth/refresh`
+- [x] `SecurityFilterChain` with `USER` and `ADMIN` roles
+- [x] Ownership checks — users can only access their own applications
+- [x] Seed script with a demo user and ~20 sample applications
 
 ### Phase 3 — Frontend Skeleton
 
