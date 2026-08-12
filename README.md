@@ -52,7 +52,7 @@ Everything after that is built incrementally while the project is already live.
 - [x] Entity → Repository → Service → Controller for `Application` (CRUD)
 - [x] DTOs with MapStruct mappers — no entities exposed through the API
 - [x] Global `@RestControllerAdvice` with a consistent error response format
-- [ ] Swagger UI via springdoc-openapi
+- [x] Swagger UI via springdoc-openapi
 
 ### Phase 2 — Authentication
 
