@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { Provider } from 'react-redux'
+import { MemoryRouter } from 'react-router-dom'
 import { createStore, type AppStore } from '@/store'
 
 /** Retries and caching are off so a test observes exactly one attempt. */
@@ -27,6 +29,19 @@ export function createWrapper(queryClient: QueryClient, store: AppStore = create
   }
 
   return { Wrapper, store }
+}
+
+/**
+ * Renders a component inside a fresh store, query client and router — the
+ * combination every page-level test needs.
+ */
+export function renderWithProviders(
+  ui: ReactNode,
+  { queryClient = createTestQueryClient(), store = createStore() } = {},
+) {
+  const { Wrapper } = createWrapper(queryClient, store)
+  const result = render(<MemoryRouter>{ui}</MemoryRouter>, { wrapper: Wrapper })
+  return { ...result, store, queryClient }
 }
 
 /** A promise whose settlement the test controls, to hold a request mid-flight. */

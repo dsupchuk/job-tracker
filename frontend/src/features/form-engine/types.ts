@@ -23,6 +23,9 @@ export type FieldValidation = {
   pattern?: string
   /** Overrides the generated message for `pattern`. */
   message?: string
+  /** ISO bounds for `date` fields, passed through to the picker. */
+  minDate?: string
+  maxDate?: string
 }
 
 /**

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
+import { toIso } from '@/lib/calendar'
 import type { Application } from '@/api/types'
 import { SchemaForm } from '@/features/form-engine/SchemaForm'
 import type { FormValues } from '@/features/form-engine/types'
-import { applicationFormSchema, toFormValues, toRequest } from './applicationFormSchema'
+import { buildApplicationFormSchema, toFormValues, toRequest } from './applicationFormSchema'
 import { useApplicationMutations } from './useApplicationMutations'
 
 type ApplicationFormDialogProps = {
@@ -26,6 +27,10 @@ export function ApplicationFormDialog({
 }: ApplicationFormDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const { create, update, remove } = useApplicationMutations()
+  // The schema pins the applied date to today, so it is rebuilt whenever the
+  // day changes rather than frozen when the module first loaded.
+  const today = toIso(new Date())
+  const schema = useMemo(() => buildApplicationFormSchema(today), [today])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -92,7 +97,7 @@ export function ApplicationFormDialog({
         <SchemaForm
           // Remounts the form when switching between records so defaults reload.
           key={application?.id ?? 'new'}
-          schema={applicationFormSchema}
+          schema={schema}
           defaultValues={toFormValues(application)}
           submitLabel={isEdit ? 'Save changes' : 'Create application'}
           pending={pending}

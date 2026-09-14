@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from 'react'
+import { DatePicker } from '@/components/ui/DatePicker'
 import type { FieldComponent, FieldComponentProps } from './types'
 
 const CONTROL =
@@ -58,16 +59,20 @@ export const SelectField: FieldComponent = (props) => (
 )
 
 /**
- * A native date input for now. Phase 6 swaps in the accessible custom picker by
- * replacing this one registry entry — no schema or renderer change.
+ * The custom picker from Phase 6. Swapping it in touched only this entry — no
+ * schema and no renderer change, which is what the registry exists for.
  */
 export const DateField: FieldComponent = (props) => (
-  <input
-    type="date"
-    className={CONTROL}
+  <DatePicker
     value={asString(props.value)}
-    onChange={(event) => props.onChange(event.target.value)}
-    {...shared(props)}
+    onChange={props.onChange}
+    onBlur={props.onBlur}
+    inputId={props.inputId}
+    describedBy={props.describedBy}
+    invalid={props.invalid}
+    required={props.field.required}
+    min={props.field.validation?.minDate}
+    max={props.field.validation?.maxDate}
   />
 )
 

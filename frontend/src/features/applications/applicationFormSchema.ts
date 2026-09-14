@@ -1,9 +1,14 @@
 import { APPLICATION_STATUSES, type Application, type ApplicationRequest } from '@/api/types'
 import type { FormSchema, FormValues } from '@/features/form-engine/types'
+import { toIso } from '@/lib/calendar'
 import { STATUS_META } from './statusMeta'
 
 /** Every status except `SAVED` means the application was actually sent. */
 const SENT_STATUSES = APPLICATION_STATUSES.filter((status) => status !== 'SAVED')
+
+function todayIso(): string {
+  return toIso(new Date())
+}
 
 /**
  * The application form expressed as data, not JSX. Adding a field here is the
@@ -12,82 +17,90 @@ const SENT_STATUSES = APPLICATION_STATUSES.filter((status) => status !== 'SAVED'
  * One step on purpose: nine fields do not need section headings, and a heading
  * reading "Role" directly above a field labelled "Position" only restates it.
  * The engine still supports grouped and wizard forms — this form just is not one.
+ *
+ * Built on demand rather than frozen at module load, because it pins the applied
+ * date to "today" — a const would go stale in a tab left open overnight.
  */
-export const applicationFormSchema: FormSchema = {
-  steps: [
-    {
-      id: 'application',
-      title: 'Application',
-      fields: [
-        {
-          name: 'position',
-          type: 'text',
-          label: 'Position',
-          required: true,
-          placeholder: 'Backend Engineer',
-          validation: { max: 255 },
-          // Checks position and company together — see `asyncValidators.ts`.
-          asyncValidator: 'uniqueApplication',
-          revalidateOn: ['company'],
-        },
-        {
-          name: 'company',
-          type: 'text',
-          label: 'Company',
-          placeholder: 'Stripe',
-          validation: { max: 255 },
-        },
-        {
-          name: 'status',
-          type: 'select',
-          label: 'Status',
-          required: true,
-          options: APPLICATION_STATUSES.map((status) => ({
-            value: status,
-            label: STATUS_META[status].label,
-          })),
-        },
-        {
-          name: 'techStack',
-          type: 'tags',
-          label: 'Tech stack',
-          placeholder: 'Add a technology and press Enter',
-          validation: { max: 20 },
-        },
-        {
-          name: 'appliedAt',
-          type: 'date',
-          label: 'Applied on',
-          help: 'Only relevant once the application has been sent.',
-          visibleIf: { field: 'status', oneOf: [...SENT_STATUSES] },
-        },
-        {
-          name: 'salaryMin',
-          type: 'money',
-          label: 'Salary from',
-          validation: { min: 0 },
-        },
-        {
-          name: 'salaryMax',
-          type: 'money',
-          label: 'Salary to',
-          validation: { min: 0 },
-        },
-        { name: 'deadline', type: 'date', label: 'Deadline' },
-        {
-          name: 'sourceUrl',
-          type: 'text',
-          label: 'Job posting',
-          placeholder: 'https://…',
-          validation: {
-            max: 2048,
-            pattern: '^https?://',
-            message: 'Must start with http:// or https://',
+export function buildApplicationFormSchema(maxAppliedAt: string = todayIso()): FormSchema {
+  return {
+    steps: [
+      {
+        id: 'application',
+        title: 'Application',
+        fields: [
+          {
+            name: 'position',
+            type: 'text',
+            label: 'Position',
+            required: true,
+            placeholder: 'Backend Engineer',
+            validation: { max: 255 },
+            // Checks position and company together — see `asyncValidators.ts`.
+            asyncValidator: 'uniqueApplication',
+            revalidateOn: ['company'],
           },
-        },
-      ],
-    },
-  ],
+          {
+            name: 'company',
+            type: 'text',
+            label: 'Company',
+            placeholder: 'Stripe',
+            validation: { max: 255 },
+          },
+          {
+            name: 'status',
+            type: 'select',
+            label: 'Status',
+            required: true,
+            options: APPLICATION_STATUSES.map((status) => ({
+              value: status,
+              label: STATUS_META[status].label,
+            })),
+          },
+          {
+            name: 'techStack',
+            type: 'tags',
+            label: 'Tech stack',
+            placeholder: 'Add a technology and press Enter',
+            validation: { max: 20 },
+          },
+          {
+            name: 'appliedAt',
+            type: 'date',
+            label: 'Applied on',
+            help: 'Only relevant once the application has been sent.',
+            visibleIf: { field: 'status', oneOf: [...SENT_STATUSES] },
+            // The backend rejects a future applied date, so the picker will not
+            // offer one — the rule is enforced where it is easiest to obey.
+            validation: { maxDate: maxAppliedAt },
+          },
+          {
+            name: 'salaryMin',
+            type: 'money',
+            label: 'Salary from',
+            validation: { min: 0 },
+          },
+          {
+            name: 'salaryMax',
+            type: 'money',
+            label: 'Salary to',
+            validation: { min: 0 },
+          },
+          { name: 'deadline', type: 'date', label: 'Deadline' },
+          {
+            name: 'sourceUrl',
+            type: 'text',
+            label: 'Job posting',
+            placeholder: 'https://…',
+            validation: {
+              max: 2048,
+              pattern: '^https?://',
+              message: 'Must start with http:// or https://',
+            },
+          },
+        ],
+      },
+    ],
+  }
 }
 
 function splitTechStack(techStack: string | null): string[] {

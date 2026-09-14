@@ -53,7 +53,8 @@ describe('SchemaForm rendering', () => {
     expect(screen.getByLabelText('Position')).toHaveAttribute('type', 'text')
     expect(screen.getByLabelText('Notes').tagName).toBe('TEXTAREA')
     expect(screen.getByLabelText('Status').tagName).toBe('SELECT')
-    expect(screen.getByLabelText('Applied on')).toHaveAttribute('type', 'date')
+    // `date` resolves to the custom picker, whose control is a dialog trigger.
+    expect(screen.getByLabelText('Applied on')).toHaveAttribute('aria-haspopup', 'dialog')
     expect(screen.getByLabelText('Salary from')).toHaveAttribute('type', 'number')
     expect(screen.getByLabelText('Tech stack')).toBeInTheDocument()
   })

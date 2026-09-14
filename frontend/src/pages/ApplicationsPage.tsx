@@ -24,7 +24,7 @@ export function ApplicationsPage() {
   const [dialog, setDialog] = useState<DialogState>(false)
 
   const applications = data ?? NO_ROWS
-  const { table, visibleRows } = useApplicationsTable(applications)
+  const { table, visibleRows } = useApplicationsTable(applications, setDialog)
 
   return (
     <section className="flex flex-col gap-4">
@@ -54,7 +54,7 @@ export function ApplicationsPage() {
               description="Widen the search or clear the stage filter to see the rest."
             />
           ) : (
-            <ApplicationsTable table={table} onRowSelect={setDialog} />
+            <ApplicationsTable table={table} />
           )}
         </>
       )}

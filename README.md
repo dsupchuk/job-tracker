@@ -11,7 +11,7 @@ A full-stack tool for tracking job applications: Kanban board, funnel analytics,
 
 | Layer | Technologies |
 |---|---|
-| Frontend | React 19, TypeScript (strict), Vite, Redux Toolkit, TanStack Query, TanStack Table, dnd-kit, Zod, Tailwind |
+| Frontend | React 19, TypeScript (strict), Vite, Redux Toolkit, TanStack Query, TanStack Table, dnd-kit, Zod, Tailwind, Archivo |
 | Backend | Java 21, Spring Boot 3, Spring Security (JWT), Spring Data JPA, Flyway, MapStruct |
 | Database | PostgreSQL |
 | Testing | Vitest + React Testing Library + MSW, JUnit 5 + Testcontainers, jest-axe |
@@ -90,7 +90,7 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 5 — Kanban and Drag & Drop
 
-- [x] Columns: Saved → Applied → Screening → Interview → Offer / Rejected, with count and total per column
+- [x] Columns: Saved → Applied → Screening → Interview → Offer / Rejected, with a count per column
 - [x] Card dragging with dnd-kit, `PATCH /api/applications/{id}/status`
 - [x] Optimistic updates with rollback on failure
 - [x] `status_history` entry written on every status change (`V4`), shown as a card timeline
@@ -98,10 +98,10 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 6 — Accessibility
 
-- [ ] Custom date picker: keyboard navigation, `role="grid"`, `aria-live` month announcements, focus trap
-- [ ] Date picker used in both the form and the filters
-- [ ] Automated checks with `jest-axe`
-- [ ] Colour contrast and focus state audit against WCAG 2.1 AA
+- [x] Custom date picker: roving tabindex, `role="grid"`, `aria-live` month announcements, focus trap
+- [x] Date picker registered as the form engine's `date` field type
+- [x] Automated checks with `jest-axe` on the table, board, form, picker and login
+- [x] Colour contrast audited in code against WCAG 2.1 AA, both themes — see `docs/accessibility.md`
 
 ### Phase 7 — Testing and CI
 
@@ -163,10 +163,11 @@ _(filled in as the project progresses — one short section per non-trivial deci
 
 - **Redux Toolkit for client state, TanStack Query for server state** — Redux owns auth, theme, and UI state; anything that lives on the server stays in the query cache instead of being mirrored into a slice
 - **Schema-driven form engine instead of hand-written forms** — field types come from a registry and validation is generated from the same schema, so a new field is one registry entry plus one schema line; see `docs/adr/0003-form-engine-and-table.md`
-- **Custom date picker instead of a library** — which accessibility requirements drove it
+- **Custom date picker instead of a library** — the keyboard grid, the announced month and the focus contract are the reason it exists; see `docs/accessibility.md`
 - **Optimistic updates on the Kanban board** — the cache moves first and is restored from the pre-move snapshot if the request fails
 - **Board keyboard model** — left/right jump columns, which dnd-kit's default coordinate getter cannot express; see `docs/adr/0004-kanban-board.md`
 - **Card order is derived, not stored** — columns sort by how long an application has been waiting, so the board never offers a reorder it cannot persist
+- **Time is the loudest signal, colour is earned** — the funnel is drawn as an ordered position rather than six colour chips, and brass marks only an offer; see `docs/adr/0005-visual-system.md`
 - **Testcontainers instead of H2** — why real PostgreSQL behaviour matters
 
 ---

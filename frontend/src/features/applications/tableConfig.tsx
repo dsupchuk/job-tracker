@@ -39,6 +39,9 @@ export const applicationTableFeatures = tableFeatures({
   sortedRowModel: createSortedRowModel(),
   filterFns: { ...filterFns, oneOf: filterFn_oneOf },
   sortFns,
+  // Opening a record is a row action, and the cell that renders it needs a way
+  // to reach the handler the page owns.
+  tableMeta: {} as { openApplication: (application: Application) => void },
 })
 
 export type ApplicationTableFeatures = typeof applicationTableFeatures
@@ -51,7 +54,18 @@ export const applicationColumns = helper.columns([
   helper.accessor('position', {
     header: 'Position',
     enableGlobalFilter: true,
-    cell: (info) => <span className="text-content text-data font-semibold">{info.getValue()}</span>,
+    // A real button, not a click handler on the row: a `<tr>` cannot be focused,
+    // so a row-level onClick makes opening a record mouse-only.
+    cell: (info) => (
+      <button
+        type="button"
+        onClick={() => info.table.options.meta?.openApplication(info.row.original)}
+        className="text-content text-data hover:text-brand text-left font-semibold"
+      >
+        {info.getValue()}
+        <span className="sr-only"> — open this application</span>
+      </button>
+    ),
   }),
   helper.accessor('company', {
     header: 'Company',

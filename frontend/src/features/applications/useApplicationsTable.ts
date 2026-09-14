@@ -8,7 +8,10 @@ import { applicationColumns, applicationTableFeatures } from './tableConfig'
  * Owns the table instance. Search and status filters come from `uiSlice` so
  * they survive navigation; sort order is view-local and resets with the page.
  */
-export function useApplicationsTable(data: Application[]) {
+export function useApplicationsTable(
+  data: Application[],
+  onOpen: (application: Application) => void,
+) {
   const search = useAppSelector((state) => state.ui.search)
   const statusFilter = useAppSelector((state) => state.ui.statusFilter)
   const [sorting, setSorting] = useState<SortingState>([{ id: 'appliedAt', desc: true }])
@@ -25,6 +28,7 @@ export function useApplicationsTable(data: Application[]) {
     state: { sorting, columnFilters, globalFilter: search },
     onSortingChange: setSorting,
     globalFilterFn: 'includesString',
+    meta: { openApplication: onOpen },
   })
 
   const rows = table.getRowModel().rows

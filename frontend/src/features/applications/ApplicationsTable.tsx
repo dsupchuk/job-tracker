@@ -1,7 +1,6 @@
 import { flexRender } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useRef } from 'react'
-import type { Application } from '@/api/types'
 import { applicationColumns } from './tableConfig'
 import type { ApplicationsTableInstance } from './useApplicationsTable'
 
@@ -22,10 +21,9 @@ const SORT_LABEL = { asc: '↑', desc: '↓' } as const
 
 type ApplicationsTableProps = {
   table: ApplicationsTableInstance
-  onRowSelect: (application: Application) => void
 }
 
-export function ApplicationsTable({ table, onRowSelect }: ApplicationsTableProps) {
+export function ApplicationsTable({ table }: ApplicationsTableProps) {
   const rows = table.getRowModel().rows
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -105,8 +103,7 @@ export function ApplicationsTable({ table, onRowSelect }: ApplicationsTableProps
             return (
               <tr
                 key={row.id}
-                onClick={() => onRowSelect(row.original)}
-                className="border-border-subtle hover:bg-ground cursor-pointer border-b"
+                className="border-border-subtle hover:bg-ground border-b"
                 style={{ height: ROW_HEIGHT }}
               >
                 {row.getAllCells().map((cell) => (
