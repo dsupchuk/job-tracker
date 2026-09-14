@@ -50,11 +50,11 @@ function FieldRow({ field, control }: FieldRowProps) {
             {/* The marker sits outside the label so the label's text stays
                 exactly the field name — `aria-required` carries the meaning. */}
             <div className="flex items-center gap-1">
-              <label htmlFor={inputId} className="text-content text-sm font-medium">
+              <label htmlFor={inputId} className="text-content text-data font-semibold">
                 {field.label}
               </label>
               {field.required && (
-                <span className="text-red-500" aria-hidden="true">
+                <span className="text-danger" aria-hidden="true">
                   *
                 </span>
               )}
@@ -71,12 +71,12 @@ function FieldRow({ field, control }: FieldRowProps) {
             />
 
             {field.help && (
-              <p id={helpId} className="text-content-muted text-xs">
+              <p id={helpId} className="text-content-muted text-meta">
                 {field.help}
               </p>
             )}
             {error && (
-              <p id={errorId} className="text-sm text-red-500">
+              <p id={errorId} className="text-danger text-data">
                 {error}
               </p>
             )}
@@ -176,7 +176,7 @@ export function SchemaForm({
   return (
     <form className="flex flex-col gap-6" onSubmit={form.handleSubmit(onSubmit)} noValidate>
       {isWizard && (
-        <p className="text-content-muted text-xs" aria-live="polite">
+        <p className="text-content-muted text-meta" aria-live="polite">
           Step {stepIndex + 1} of {steps.length} — {currentStep?.title}
         </p>
       )}
@@ -184,9 +184,9 @@ export function SchemaForm({
       {renderedSteps.map((step) => (
         <fieldset key={step.id} className="flex flex-col gap-4">
           {!isWizard && steps.length > 1 && (
-            <legend className="text-content text-sm font-semibold">{step.title}</legend>
+            <legend className="text-content text-data font-semibold">{step.title}</legend>
           )}
-          {step.description && <p className="text-content-muted text-xs">{step.description}</p>}
+          {step.description && <p className="text-content-muted text-meta">{step.description}</p>}
 
           {step.fields
             .filter((field) => isFieldVisible(field, values))
@@ -197,7 +197,7 @@ export function SchemaForm({
       ))}
 
       {errorMessage && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-danger text-data">
           {errorMessage}
         </p>
       )}

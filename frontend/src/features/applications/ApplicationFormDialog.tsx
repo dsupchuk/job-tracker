@@ -64,35 +64,43 @@ export function ApplicationFormDialog({
       ref={dialogRef}
       onClose={onClose}
       aria-labelledby="application-dialog-title"
-      className="bg-surface text-content border-border-subtle m-auto w-full max-w-xl rounded-xl border p-6 backdrop:bg-black/50"
+      // The radius and the clip live here; scrolling lives on the inner box.
+      // A scrollbar on the rounded element itself is painted over the corners
+      // and squares them off.
+      className="bg-surface text-content border-border-subtle rounded-overlay m-auto w-[calc(100%-1.5rem)] max-w-xl overflow-hidden border p-0 backdrop:bg-black/40"
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h2 id="application-dialog-title" className="text-content text-base font-semibold">
-          {isEdit ? 'Edit application' : 'New application'}
-        </h2>
-        {isEdit && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={pending}
-            className="text-xs text-red-500 underline underline-offset-4 disabled:opacity-50"
+      <div className="max-h-[90dvh] overflow-y-auto p-5 sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2
+            id="application-dialog-title"
+            className="text-content text-lead font-semibold tracking-tight"
           >
-            Delete
-          </button>
-        )}
-      </div>
+            {isEdit ? 'Edit application' : 'New application'}
+          </h2>
+          {isEdit && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={pending}
+              className="text-danger text-meta underline underline-offset-4 disabled:opacity-50"
+            >
+              Delete
+            </button>
+          )}
+        </div>
 
-      <SchemaForm
-        // Remounts the form when switching between records so defaults reload.
-        key={application?.id ?? 'new'}
-        schema={applicationFormSchema}
-        defaultValues={toFormValues(application)}
-        submitLabel={isEdit ? 'Save changes' : 'Create application'}
-        pending={pending}
-        onSubmit={handleSubmit}
-        onCancel={onClose}
-        validationContext={{ applications, currentId: application?.id ?? null }}
-      />
+        <SchemaForm
+          // Remounts the form when switching between records so defaults reload.
+          key={application?.id ?? 'new'}
+          schema={applicationFormSchema}
+          defaultValues={toFormValues(application)}
+          submitLabel={isEdit ? 'Save changes' : 'Create application'}
+          pending={pending}
+          onSubmit={handleSubmit}
+          onCancel={onClose}
+          validationContext={{ applications, currentId: application?.id ?? null }}
+        />
+      </div>
     </dialog>
   )
 }

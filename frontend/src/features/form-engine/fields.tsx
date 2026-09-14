@@ -2,7 +2,7 @@ import { useState, type KeyboardEvent } from 'react'
 import type { FieldComponent, FieldComponentProps } from './types'
 
 const CONTROL =
-  'border-border-subtle bg-surface text-content placeholder:text-content-muted w-full rounded-md border px-3 py-2 text-sm aria-invalid:border-red-500'
+  'border-border-subtle bg-surface text-content placeholder:text-content-muted rounded-data text-data aria-invalid:border-danger w-full border px-3 py-2'
 
 function asString(value: unknown): string {
   return typeof value === 'string' ? value : ''
@@ -132,7 +132,7 @@ export const TagsField: FieldComponent = (props) => {
       ))}
       <input
         type="text"
-        className="text-content placeholder:text-content-muted min-w-24 flex-1 bg-transparent text-sm outline-none"
+        className="text-content placeholder:text-content-muted text-data min-w-24 flex-1 bg-transparent outline-none"
         placeholder={props.field.placeholder ?? 'Add and press Enter'}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}

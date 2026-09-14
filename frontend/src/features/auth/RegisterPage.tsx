@@ -12,6 +12,7 @@ export function RegisterPage() {
   return (
     <CredentialsForm
       title="Create an account"
+      intro="Keep every application in one place and see at a glance which ones have gone quiet."
       submitLabel="Create account"
       pending={pending}
       errorMessage={errorMessage}

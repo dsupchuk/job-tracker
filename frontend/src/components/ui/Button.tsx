@@ -5,14 +5,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const VARIANTS = {
-  primary: 'bg-brand text-brand-contrast hover:opacity-90',
-  ghost: 'border border-border-subtle text-content hover:bg-surface-muted',
+  // Brass is the one earned colour, so only the primary action wears it.
+  primary: 'bg-brand text-brand-contrast hover:brightness-110',
+  ghost: 'border-border-subtle text-content hover:bg-surface-muted border',
 } as const
 
 export function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${VARIANTS[variant]} ${className}`}
+      className={`rounded-data text-data inline-flex items-center justify-center gap-2 px-3.5 py-2 font-semibold transition-[filter,background-color] disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${className}`}
       {...props}
     />
   )

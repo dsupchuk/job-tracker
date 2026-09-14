@@ -10,9 +10,9 @@ export function ThemeToggle() {
       type="button"
       onClick={() => dispatch(themeToggled())}
       aria-pressed={mode === 'dark'}
-      className="border-border-subtle text-content hover:bg-surface-muted rounded-md border px-2.5 py-1.5 text-sm"
+      className="border-border-subtle text-content-muted hover:text-content hover:bg-surface-muted rounded-data text-meta border px-2.5 py-2 font-semibold"
     >
-      {mode === 'dark' ? '☀️' : '🌙'}
+      {mode === 'dark' ? 'Light' : 'Dark'}
       <span className="sr-only">Switch to {mode === 'dark' ? 'light' : 'dark'} theme</span>
     </button>
   )

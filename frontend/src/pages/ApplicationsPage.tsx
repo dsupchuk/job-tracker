@@ -28,12 +28,12 @@ export function ApplicationsPage() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-content text-lg font-semibold">Applications</h1>
+      <h1 className="text-content text-title font-semibold tracking-tight">Applications</h1>
 
       {isPending && <SkeletonRows rows={8} />}
 
       {error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-danger text-data">
           {apiErrorMessage(error, 'Could not load applications')}
         </p>
       )}
@@ -44,14 +44,14 @@ export function ApplicationsPage() {
 
           {applications.length === 0 ? (
             <EmptyState
-              title="No applications yet"
-              description="Add the first one to start tracking."
+              title="Start tracking your search"
+              description="Add the first application and this table fills in — stage, salary range, and how long each one has been waiting on a reply."
               action={<Button onClick={() => setDialog(null)}>New application</Button>}
             />
           ) : visibleRows.length === 0 ? (
             <EmptyState
-              title="No matches"
-              description="No application matches the current filters."
+              title="Nothing matches those filters"
+              description="Widen the search or clear the stage filter to see the rest."
             />
           ) : (
             <ApplicationsTable table={table} onRowSelect={setDialog} />

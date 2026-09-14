@@ -17,12 +17,12 @@ export function BoardPage() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-content text-lg font-semibold">Board</h1>
+      <h1 className="text-content text-title font-semibold tracking-tight">Board</h1>
 
       {isPending && <SkeletonRows rows={5} />}
 
       {error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-danger text-data">
           {apiErrorMessage(error, 'Could not load the board')}
         </p>
       )}
@@ -30,8 +30,8 @@ export function BoardPage() {
       {data &&
         (data.length === 0 ? (
           <EmptyState
-            title="Nothing to track yet"
-            description="Add an application on the Applications page to see it here."
+            title="The board fills in as you apply"
+            description="Add an application on the Applications page and it lands in the first column, ready to be dragged along as things progress."
           />
         ) : (
           <Board applications={data} onOpen={setDetail} />

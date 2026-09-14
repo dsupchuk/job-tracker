@@ -12,8 +12,9 @@ import {
   type TableFeatures,
 } from '@tanstack/react-table'
 import type { Application } from '@/api/types'
+import { AgeMeter } from './AgeMeter'
 import { formatDate, formatSalaryRange } from './format'
-import { StatusBadge } from './StatusBadge'
+import { StageIndicator } from './StageIndicator'
 
 /**
  * Keeps rows whose cell value appears in the selected set. The built-in
@@ -50,27 +51,36 @@ export const applicationColumns = helper.columns([
   helper.accessor('position', {
     header: 'Position',
     enableGlobalFilter: true,
-    cell: (info) => <span className="text-content font-medium">{info.getValue()}</span>,
+    cell: (info) => <span className="text-content text-data font-semibold">{info.getValue()}</span>,
   }),
   helper.accessor('company', {
     header: 'Company',
     enableGlobalFilter: true,
     sortUndefined: 'last',
-    cell: (info) => <span className="text-content-muted">{info.getValue()}</span>,
+    cell: (info) => <span className="text-content text-data">{info.getValue()}</span>,
   }),
   helper.accessor('status', {
     header: 'Status',
     enableGlobalFilter: false,
     // The status filter holds an array of selected statuses.
     filterFn: 'oneOf',
-    cell: (info) => <StatusBadge status={info.getValue()} />,
+    cell: (info) => <StageIndicator status={info.getValue()} />,
   }),
   helper.accessor('appliedAt', {
-    header: 'Applied',
+    header: 'Waiting',
     enableGlobalFilter: false,
     // ISO dates sort chronologically as plain strings; nulls sort last.
     sortUndefined: 'last',
-    cell: (info) => <span className="text-content-muted">{formatDate(info.getValue())}</span>,
+    cell: (info) => {
+      const appliedAt = info.getValue()
+      if (!appliedAt) return <span className="text-content-muted text-meta">not sent</span>
+      return (
+        <span className="flex flex-col gap-1">
+          <AgeMeter appliedAt={appliedAt} />
+          <span className="text-content-muted text-meta numeric">{formatDate(appliedAt)}</span>
+        </span>
+      )
+    },
   }),
   helper.accessor((row) => row.salaryMax ?? row.salaryMin, {
     id: 'salary',
@@ -78,7 +88,7 @@ export const applicationColumns = helper.columns([
     enableGlobalFilter: false,
     sortUndefined: 'last',
     cell: (info) => (
-      <span className="text-content-muted tabular-nums">
+      <span className="text-content text-data numeric">
         {formatSalaryRange(info.row.original.salaryMin, info.row.original.salaryMax)}
       </span>
     ),
@@ -87,7 +97,7 @@ export const applicationColumns = helper.columns([
     header: 'Tech stack',
     enableGlobalFilter: true,
     enableSorting: false,
-    cell: (info) => <span className="text-content-muted">{info.getValue()}</span>,
+    cell: (info) => <span className="text-content-muted text-data">{info.getValue()}</span>,
   }),
   helper.accessor('sourceUrl', {
     header: 'Source',

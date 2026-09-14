@@ -22,7 +22,7 @@ export function StatusTimeline({ applicationId }: { applicationId: number }) {
 
   if (error) {
     return (
-      <p role="alert" className="text-sm text-red-500">
+      <p role="alert" className="text-danger text-data">
         {apiErrorMessage(error, 'Could not load the timeline')}
       </p>
     )
@@ -32,10 +32,10 @@ export function StatusTimeline({ applicationId }: { applicationId: number }) {
     <ol className="flex flex-col gap-3">
       {data.map((entry) => (
         <li key={entry.id} className="flex items-baseline gap-3">
-          <span className="text-content-muted w-40 shrink-0 text-xs tabular-nums">
+          <span className="text-content-muted text-meta numeric w-40 shrink-0">
             {WHEN.format(new Date(entry.changedAt))}
           </span>
-          <span className="text-content text-sm">
+          <span className="text-content text-data">
             {entry.fromStatus ? (
               <>
                 {STATUS_META[entry.fromStatus].label} → {STATUS_META[entry.toStatus].label}

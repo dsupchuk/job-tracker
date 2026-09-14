@@ -20,7 +20,7 @@ function ToastItem({ toast }: { toast: Toast }) {
 
   return (
     <li
-      className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-sm ${KIND_CLASS[toast.kind]}`}
+      className={`flex items-start gap-3 rounded-card text-data border px-4 py-3 shadow-sm ${KIND_CLASS[toast.kind]}`}
     >
       <span className="flex-1">{toast.message}</span>
       <button

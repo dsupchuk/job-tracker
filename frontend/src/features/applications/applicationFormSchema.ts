@@ -8,13 +8,16 @@ const SENT_STATUSES = APPLICATION_STATUSES.filter((status) => status !== 'SAVED'
 /**
  * The application form expressed as data, not JSX. Adding a field here is the
  * only change needed as long as its type already exists in `fieldRegistry`.
+ *
+ * One step on purpose: nine fields do not need section headings, and a heading
+ * reading "Role" directly above a field labelled "Position" only restates it.
+ * The engine still supports grouped and wizard forms — this form just is not one.
  */
 export const applicationFormSchema: FormSchema = {
-  mode: 'single',
   steps: [
     {
-      id: 'role',
-      title: 'Role',
+      id: 'application',
+      title: 'Application',
       fields: [
         {
           name: 'position',
@@ -58,12 +61,6 @@ export const applicationFormSchema: FormSchema = {
           help: 'Only relevant once the application has been sent.',
           visibleIf: { field: 'status', oneOf: [...SENT_STATUSES] },
         },
-      ],
-    },
-    {
-      id: 'details',
-      title: 'Compensation and links',
-      fields: [
         {
           name: 'salaryMin',
           type: 'money',

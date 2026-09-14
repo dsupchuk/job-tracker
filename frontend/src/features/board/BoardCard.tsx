@@ -1,13 +1,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import type { Application } from '@/api/types'
-import { daysSince, formatSalaryRange } from '@/features/applications/format'
-
-function ageLabel(application: Application): string | null {
-  const days = daysSince(application.appliedAt)
-  if (days === null) return null
-  if (days <= 0) return 'applied today'
-  return `${days} day${days === 1 ? '' : 's'} since applying`
-}
+import { AgeMeter } from '@/features/applications/AgeMeter'
+import { formatSalaryRange } from '@/features/applications/format'
 
 /** The visual card, shared by the draggable item and the drag overlay. */
 export function CardBody({
@@ -17,19 +11,18 @@ export function CardBody({
   application: Application
   dragging?: boolean
 }) {
-  const age = ageLabel(application)
   const salary = formatSalaryRange(application.salaryMin, application.salaryMax)
 
   return (
     <div
-      className={`border-border-subtle bg-surface flex flex-col gap-1 rounded-lg border p-3 pr-9 text-left ${
+      className={`border-border-subtle bg-surface rounded-card flex flex-col gap-1.5 border p-3 pr-9 text-left ${
         dragging ? 'shadow-lg' : ''
       }`}
     >
-      <p className="text-content text-sm font-medium">{application.position}</p>
-      {application.company && <p className="text-content-muted text-xs">{application.company}</p>}
-      {salary && <p className="text-content-muted text-xs tabular-nums">{salary}</p>}
-      {age && <p className="text-content-muted text-xs">{age}</p>}
+      <p className="text-content text-data leading-snug font-semibold">{application.position}</p>
+      {application.company && <p className="text-content-muted text-meta">{application.company}</p>}
+      {salary && <p className="text-content text-meta numeric">{salary}</p>}
+      <AgeMeter appliedAt={application.appliedAt} />
     </div>
   )
 }

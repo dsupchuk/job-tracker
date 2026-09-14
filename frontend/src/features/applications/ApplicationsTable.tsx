@@ -5,20 +5,20 @@ import type { Application } from '@/api/types'
 import { applicationColumns } from './tableConfig'
 import type { ApplicationsTableInstance } from './useApplicationsTable'
 
-const ROW_HEIGHT = 52
+const ROW_HEIGHT = 60
 
 /** Fixed layout keeps columns aligned while rows are virtualised. */
 const COLUMN_WIDTHS: Record<string, string> = {
-  position: 'w-[21%]',
+  position: 'w-[20%]',
   company: 'w-[13%]',
-  status: 'w-[10%]',
-  appliedAt: 'w-[12%]',
-  salary: 'w-[16%]',
-  techStack: 'w-[20%]',
-  sourceUrl: 'w-[8%]',
+  status: 'w-[15%]',
+  appliedAt: 'w-[13%]',
+  salary: 'w-[15%]',
+  techStack: 'w-[17%]',
+  sourceUrl: 'w-[7%]',
 }
 
-const SORT_LABEL = { asc: '▲', desc: '▼' } as const
+const SORT_LABEL = { asc: '↑', desc: '↓' } as const
 
 type ApplicationsTableProps = {
   table: ApplicationsTableInstance
@@ -43,12 +43,15 @@ export function ApplicationsTable({ table, onRowSelect }: ApplicationsTableProps
   return (
     <div
       ref={scrollRef}
-      className="border-border-subtle h-[68vh] overflow-auto rounded-lg border"
+      className="border-border-subtle bg-surface rounded-card h-[68vh] overflow-auto border"
       role="region"
       aria-label="Applications"
       tabIndex={0}
     >
-      <table className="w-full table-fixed border-collapse text-left text-sm">
+      {/* A data table cannot usefully shrink to a phone: seven columns at 390px
+          leave two characters each. It keeps its readable width and the region
+          scrolls sideways instead. */}
+      <table className="w-full min-w-[56rem] table-fixed border-collapse text-left">
         <thead className="bg-surface-muted sticky top-0 z-10">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -68,7 +71,7 @@ export function ApplicationsTable({ table, onRowSelect }: ApplicationsTableProps
                           ? 'none'
                           : undefined
                     }
-                    className={`border-border-subtle text-content-muted border-b px-4 py-2 text-xs font-semibold ${COLUMN_WIDTHS[header.column.id] ?? ''}`}
+                    className={`border-border-subtle text-content-muted text-meta border-b px-4 py-2.5 font-semibold ${COLUMN_WIDTHS[header.column.id] ?? ''}`}
                   >
                     {canSort ? (
                       <button
@@ -103,11 +106,11 @@ export function ApplicationsTable({ table, onRowSelect }: ApplicationsTableProps
               <tr
                 key={row.id}
                 onClick={() => onRowSelect(row.original)}
-                className="border-border-subtle hover:bg-surface-muted cursor-pointer border-b"
+                className="border-border-subtle hover:bg-ground cursor-pointer border-b"
                 style={{ height: ROW_HEIGHT }}
               >
                 {row.getAllCells().map((cell) => (
-                  <td key={cell.id} className="truncate px-4 py-2">
+                  <td key={cell.id} className="truncate px-4 py-2 align-middle">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

@@ -1,5 +1,5 @@
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`bg-surface-muted animate-pulse rounded-md ${className}`} />
+  return <div className={`bg-surface-muted rounded-data animate-pulse ${className}`} />
 }
 
 /** Placeholder for a list or table while its query is loading. */

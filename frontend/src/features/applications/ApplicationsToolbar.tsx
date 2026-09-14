@@ -25,7 +25,7 @@ export function ApplicationsToolbar({ visibleRows, onCreate }: ApplicationsToolb
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
       <label className="sr-only" htmlFor="applications-search">
         Search applications
       </label>
@@ -34,12 +34,19 @@ export function ApplicationsToolbar({ visibleRows, onCreate }: ApplicationsToolb
         type="search"
         value={search}
         onChange={(event) => dispatch(searchChanged(event.target.value))}
-        placeholder="Search position, company or tech stack…"
-        className="border-border-subtle bg-surface text-content placeholder:text-content-muted w-72 rounded-md border px-3 py-2 text-sm"
+        placeholder="Search position, company or tech stack"
+        className="border-border-subtle bg-surface text-content placeholder:text-content-muted rounded-data text-data w-full border px-3 py-2 sm:w-72"
       />
 
-      <fieldset className="flex flex-wrap items-center gap-1.5">
-        <legend className="sr-only">Filter by status</legend>
+      {/* The filter reads as one control: stages in funnel order, selection
+          shown by weight rather than by giving each status its own colour.
+          Six stages do not fit a phone, so the strip scrolls rather than
+          pushing the whole page sideways. */}
+      {/* `min-w-0` is load-bearing: a flex item defaults to `min-width: auto`,
+          so without it the strip refuses to shrink and pushes the page wider
+          than the screen instead of scrolling inside itself. */}
+      <fieldset className="border-border-subtle bg-surface rounded-data flex min-w-0 items-center overflow-x-auto border">
+        <legend className="sr-only">Filter by stage</legend>
         {APPLICATION_STATUSES.map((status) => {
           const active = statusFilter.includes(status)
           return (
@@ -48,10 +55,8 @@ export function ApplicationsToolbar({ visibleRows, onCreate }: ApplicationsToolb
               type="button"
               aria-pressed={active}
               onClick={() => toggleStatus(status)}
-              className={`rounded-full border px-2.5 py-1 text-xs font-medium transition ${
-                active
-                  ? 'border-brand bg-brand text-brand-contrast'
-                  : 'border-border-subtle text-content-muted hover:bg-surface-muted'
+              className={`text-meta border-border-subtle shrink-0 px-2.5 py-2 font-semibold first:rounded-l-[3px] last:rounded-r-[3px] not-first:border-l ${
+                active ? 'bg-content text-surface' : 'text-content-muted hover:bg-surface-muted'
               }`}
             >
               {STATUS_META[status].label}
@@ -64,14 +69,14 @@ export function ApplicationsToolbar({ visibleRows, onCreate }: ApplicationsToolb
         <button
           type="button"
           onClick={() => dispatch(filtersCleared())}
-          className="text-content-muted hover:text-content text-xs underline underline-offset-4"
+          className="text-content-muted hover:text-content text-meta underline underline-offset-4"
         >
           Clear filters
         </button>
       )}
 
-      <div className="ml-auto flex items-center gap-2">
-        <span className="text-content-muted text-xs">{visibleRows.length} shown</span>
+      <div className="ml-auto flex items-center gap-3">
+        <span className="text-content-muted text-meta numeric">{visibleRows.length} shown</span>
         <Button
           variant="ghost"
           onClick={() => downloadCsv(visibleRows)}
