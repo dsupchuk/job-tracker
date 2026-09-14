@@ -8,7 +8,11 @@ export type Theme = 'light' | 'dark'
 function initialTheme(): Theme {
   const stored = readStored(THEME_KEY)
   if (stored === 'light' || stored === 'dark') return stored
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+
+  // `matchMedia` is missing in some environments (jsdom among them), and this
+  // runs at module load — an unguarded call would take the whole app down.
+  const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches
+  return prefersDark ? 'dark' : 'light'
 }
 
 const themeSlice = createSlice({

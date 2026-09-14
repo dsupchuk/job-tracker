@@ -93,8 +93,9 @@ The core entity — one job application.
 |---|---|---|---|
 | `id` | `bigint` | PK, identity | |
 | `user_id` | `bigint` | NOT NULL, FK → `users(id)` | ON DELETE CASCADE; every query filters by this |
-| `company_id` | `bigint` | FK → `companies(id)` | ON DELETE SET NULL |
-| `position` | `text` | NOT NULL | job title |
+| `company` | `text` | | denormalized company name (`V3`); see design notes |
+| `company_id` | `bigint` | FK → `companies(id)` | ON DELETE SET NULL; only once `companies` lands |
+| `position` | `text` | NOT NULL | job title, role only — the company lives in its own column |
 | `status` | `text` | NOT NULL, default `'SAVED'` | see status enum below |
 | `source_url` | `text` | | link to the posting |
 | `salary_min` | `integer` | | |
@@ -153,6 +154,7 @@ SAVED → APPLIED → SCREENING → INTERVIEW → OFFER
 - `users(email)` — unique, for login lookup.
 - `applications(user_id)` — every list query is scoped by user.
 - `applications(user_id, status)` — Kanban columns and status filters.
+- `applications(user_id, company)` — company lookups and the duplicate check.
 - `status_history(application_id)` — timeline lookups.
 - `notes(application_id)` — notes per application.
 
@@ -164,6 +166,10 @@ SAVED → APPLIED → SCREENING → INTERVIEW → OFFER
 - **Flyway owns the schema.** JPA runs with `ddl-auto: validate`; structural changes go through versioned migrations (`V1__init.sql`, `V2__users_auth.sql`, ...).
 - **`status_history` is append-only.** It exists to compute "average time in each status" for the analytics dashboard (Phase 9).
 - **`tech_stack` starts denormalized** as comma-separated text; promote to a `tags` / join table only if querying by individual technology becomes necessary.
+- **`company` starts denormalized too**, as a plain text column on `applications` (`V3`). It
+  gives the UI a sortable, filterable company without the cost of a second entity and its CRUD.
+  Promote to the `companies` table above once a company needs data of its own — a website,
+  notes, or several applications sharing one record.
 
 ---
 
@@ -177,6 +183,7 @@ This document describes the **target** design. It is built incrementally through
 | `applications` (core columns + `created_at`, `updated_at`) | `V1__init.sql` | ✅ implemented |
 | `users.role`, unique index on `users.email` | `V2__users_auth.sql` | ✅ implemented |
 | `applications.user_id` (ownership FK) | `V2__users_auth.sql` | ✅ implemented |
+| `applications.company` (denormalized text) | `V3__application_company.sql` | ✅ implemented |
 | `companies`, `applications.company_id` | later phase | ⏳ planned |
 | `status_history` | Phase 5 | ⏳ planned |
 | `notes` | later phase | ⏳ planned |

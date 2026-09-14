@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public record ApplicationResponse(
         Long id,
         String position,
+        String company,
         ApplicationStatus status,
         String sourceUrl,
         Integer salaryMin,

@@ -81,7 +81,8 @@ public class DataSeeder implements ApplicationRunner {
             String[] r = rows[i];
             Application application = new Application();
             application.setUserId(userId);
-            application.setPosition(r[0] + " @ " + r[1]);
+            application.setPosition(r[0]);
+            application.setCompany(r[1]);
             application.setStatus(ApplicationStatus.valueOf(r[2]));
             application.setSalaryMin(Integer.valueOf(r[3]));
             application.setSalaryMax(Integer.valueOf(r[4]));

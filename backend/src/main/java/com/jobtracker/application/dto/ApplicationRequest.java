@@ -14,6 +14,7 @@ import java.time.LocalDate;
  */
 public record ApplicationRequest(
         @NotBlank @Size(max = 255) String position,
+        @Size(max = 255) String company,
         ApplicationStatus status,
         @Size(max = 2048) String sourceUrl,
         @PositiveOrZero Integer salaryMin,

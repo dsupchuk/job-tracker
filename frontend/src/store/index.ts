@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { authReducer } from './authSlice'
 import { persistenceMiddleware } from './persistence'
 import { themeReducer } from './themeSlice'
+import { toastReducer } from './toastSlice'
 import { uiReducer } from './uiSlice'
 
 /**
@@ -13,6 +14,7 @@ export function createStore() {
     reducer: {
       auth: authReducer,
       theme: themeReducer,
+      toasts: toastReducer,
       ui: uiReducer,
     },
     middleware: (getDefaultMiddleware) =>

@@ -38,6 +38,9 @@ public class Application {
     @Column(nullable = false)
     private String position;
 
+    /** Free text rather than a relation — see ADR 0003. */
+    private String company;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.SAVED;

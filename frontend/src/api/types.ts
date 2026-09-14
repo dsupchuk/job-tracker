@@ -14,6 +14,7 @@ export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number]
 export type Application = {
   id: number
   position: string
+  company: string | null
   status: ApplicationStatus
   sourceUrl: string | null
   salaryMin: number | null
@@ -28,6 +29,7 @@ export type Application = {
 
 export type ApplicationRequest = {
   position: string
+  company?: string | null
   status?: ApplicationStatus
   sourceUrl?: string | null
   salaryMin?: number | null

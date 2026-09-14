@@ -1,26 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
-import { applicationKeys, listApplications } from '@/api/applications'
+import { useState } from 'react'
+import { applicationKeys, listAllApplications } from '@/api/applications'
 import { apiErrorMessage } from '@/api/client'
+import type { Application } from '@/api/types'
+import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRows } from '@/components/ui/Skeleton'
+import { ApplicationFormDialog } from '@/features/applications/ApplicationFormDialog'
+import { ApplicationsTable } from '@/features/applications/ApplicationsTable'
+import { ApplicationsToolbar } from '@/features/applications/ApplicationsToolbar'
+import { useApplicationsTable } from '@/features/applications/useApplicationsTable'
 
-const PAGE_PARAMS = { page: 0, size: 20, sort: 'createdAt,desc' }
+const NO_ROWS: Application[] = []
 
-/**
- * Placeholder list proving the API wiring end to end. Phase 4 replaces it with
- * the TanStack Table implementation.
- */
+/** `null` means create mode; `false` means the dialog is closed. */
+type DialogState = Application | null | false
+
 export function ApplicationsPage() {
   const { data, isPending, error } = useQuery({
-    queryKey: applicationKeys.list(PAGE_PARAMS),
-    queryFn: () => listApplications(PAGE_PARAMS),
+    queryKey: applicationKeys.listAll(),
+    queryFn: listAllApplications,
   })
+  const [dialog, setDialog] = useState<DialogState>(false)
+
+  const applications = data ?? NO_ROWS
+  const { table, visibleRows } = useApplicationsTable(applications)
 
   return (
     <section className="flex flex-col gap-4">
       <h1 className="text-content text-lg font-semibold">Applications</h1>
 
-      {isPending && <SkeletonRows />}
+      {isPending && <SkeletonRows rows={8} />}
 
       {error && (
         <p role="alert" className="text-sm text-red-500">
@@ -28,34 +38,33 @@ export function ApplicationsPage() {
         </p>
       )}
 
-      {data && data.content.length === 0 && (
-        <EmptyState
-          title="No applications yet"
-          description="Applications you track will show up here."
-        />
-      )}
-
-      {data && data.content.length > 0 && (
-        <ul className="flex flex-col gap-2">
-          {data.content.map((application) => (
-            <li
-              key={application.id}
-              className="border-border-subtle flex items-center justify-between rounded-lg border px-4 py-3"
-            >
-              <span className="text-content text-sm font-medium">{application.position}</span>
-              <span className="border-border-subtle text-content-muted rounded-full border px-2 py-0.5 text-xs">
-                {application.status}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
       {data && (
-        <p className="text-content-muted text-xs">
-          {data.totalElements} total · page {data.number + 1} of {Math.max(data.totalPages, 1)}
-        </p>
+        <>
+          <ApplicationsToolbar visibleRows={visibleRows} onCreate={() => setDialog(null)} />
+
+          {applications.length === 0 ? (
+            <EmptyState
+              title="No applications yet"
+              description="Add the first one to start tracking."
+              action={<Button onClick={() => setDialog(null)}>New application</Button>}
+            />
+          ) : visibleRows.length === 0 ? (
+            <EmptyState
+              title="No matches"
+              description="No application matches the current filters."
+            />
+          ) : (
+            <ApplicationsTable table={table} onRowSelect={setDialog} />
+          )}
+        </>
       )}
+
+      <ApplicationFormDialog
+        open={dialog !== false}
+        application={dialog === false ? null : dialog}
+        applications={applications}
+        onClose={() => setDialog(false)}
+      />
     </section>
   )
 }

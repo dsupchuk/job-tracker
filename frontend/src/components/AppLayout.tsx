@@ -5,6 +5,7 @@ import { loggedOut } from '@/store/authSlice'
 import { useAppDispatch } from '@/store/hooks'
 import { Button } from './ui/Button'
 import { ThemeToggle } from './ThemeToggle'
+import { ToastViewport } from './ToastViewport'
 
 const NAV_ITEMS = [
   { to: '/applications', label: 'Applications' },
@@ -59,6 +60,8 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <ToastViewport />
     </div>
   )
 }

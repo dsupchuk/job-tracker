@@ -28,7 +28,7 @@ job-tracker/
 │   └── src/
 │       ├── api/       # Axios client and typed endpoint functions
 │       ├── store/     # Redux Toolkit slices (client state only)
-│       ├── features/  # auth, theme — logic grouped by domain
+│       ├── features/  # auth, theme, applications, form-engine — grouped by domain
 │       ├── components/# layout and shared UI
 │       └── pages/     # route-level screens
 ├── docker/            # docker-compose.yml, Dockerfiles
@@ -58,6 +58,7 @@ Everything after that is built incrementally while the project is already live.
 - [x] Entity → Repository → Service → Controller for `Application` (CRUD)
 - [x] DTOs with MapStruct mappers — no entities exposed through the API
 - [x] Global `@RestControllerAdvice` with a consistent error response format
+- [x] `applications.company` as a denormalized column (`V3`), split out of the position string
 - [x] Swagger UI via springdoc-openapi
 
 ### Phase 2 — Authentication
@@ -77,14 +78,15 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 4 — List and Form
 
-- [ ] Applications table with TanStack Table: sorting, filtering by status and company (filter state in `uiSlice`)
-- [ ] Row virtualization for large datasets
-- [ ] **Schema-driven form engine**: JSON schema → rendered form
-  - [ ] Field type registry: `text`, `textarea`, `select`, `date`, `money`, `tags`
-  - [ ] Conditional field visibility (`visibleIf`)
-  - [ ] Validation generated from the schema via Zod
-- [ ] Create/edit application form built on the engine
-- [ ] CSV export
+- [x] Applications table with TanStack Table: sorting, status filter and global search across position, company and tech stack (filter state in `uiSlice`)
+- [x] Row virtualization for large datasets
+- [x] **Schema-driven form engine**: JSON schema → rendered form
+  - [x] Field type registry: `text`, `textarea`, `select`, `date`, `money`, `tags`
+  - [x] Conditional field visibility (`visibleIf`), hidden fields excluded from validation
+  - [x] Validation generated from the schema via Zod, including async rules
+  - [x] Multi-step (`wizard`) mode with per-step validation
+- [x] Create/edit/delete application form built on the engine, with optimistic updates and toasts
+- [x] CSV export of the current filtered view
 
 ### Phase 5 — Kanban and Drag & Drop
 
@@ -151,7 +153,7 @@ Swagger: http://localhost:8080/swagger-ui.html
 The frontend reads the API base URL from `VITE_API_URL`. `frontend/.env` already points at
 `http://localhost:8080`; copy `frontend/.env.example` to `frontend/.env.local` to override it.
 
-Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `build`.
+Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `test`, `build`.
 
 ---
 
@@ -160,7 +162,7 @@ Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `build`.
 _(filled in as the project progresses — one short section per non-trivial decision)_
 
 - **Redux Toolkit for client state, TanStack Query for server state** — Redux owns auth, theme, and UI state; anything that lives on the server stays in the query cache instead of being mirrored into a slice
-- **Schema-driven form engine instead of hand-written forms** — the reasoning and where the abstraction stops paying off
+- **Schema-driven form engine instead of hand-written forms** — field types come from a registry and validation is generated from the same schema, so a new field is one registry entry plus one schema line; see `docs/adr/0003-form-engine-and-table.md`
 - **Custom date picker instead of a library** — which accessibility requirements drove it
 - **Optimistic updates on the Kanban board** — how conflicts are resolved
 - **Testcontainers instead of H2** — why real PostgreSQL behaviour matters
