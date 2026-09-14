@@ -1,0 +1,34 @@
+import { useId, type InputHTMLAttributes, type Ref } from 'react'
+
+type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
+  label: string
+  error?: string | undefined
+  ref?: Ref<HTMLInputElement>
+}
+
+export function TextField({ label, error, id, ref, ...props }: TextFieldProps) {
+  const generatedId = useId()
+  const inputId = id ?? generatedId
+  const errorId = `${inputId}-error`
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={inputId} className="text-content text-sm font-medium">
+        {label}
+      </label>
+      <input
+        id={inputId}
+        ref={ref}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className="border-border-subtle bg-surface text-content placeholder:text-content-muted rounded-md border px-3 py-2 text-sm aria-invalid:border-red-500"
+        {...props}
+      />
+      {error && (
+        <p id={errorId} className="text-sm text-red-500">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}

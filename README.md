@@ -11,7 +11,7 @@ A full-stack tool for tracking job applications: Kanban board, funnel analytics,
 
 | Layer | Technologies |
 |---|---|
-| Frontend | React 19, TypeScript (strict), Vite, TanStack Query, TanStack Table, dnd-kit, Zod, Tailwind |
+| Frontend | React 19, TypeScript (strict), Vite, Redux Toolkit, TanStack Query, TanStack Table, dnd-kit, Zod, Tailwind |
 | Backend | Java 21, Spring Boot 3, Spring Security (JWT), Spring Data JPA, Flyway, MapStruct |
 | Database | PostgreSQL |
 | Testing | Vitest + React Testing Library + MSW, JUnit 5 + Testcontainers, jest-axe |
@@ -25,6 +25,12 @@ A full-stack tool for tracking job applications: Kanban board, funnel analytics,
 job-tracker/
 ├── backend/           # Spring Boot application
 ├── frontend/          # React + Vite application
+│   └── src/
+│       ├── api/       # Axios client and typed endpoint functions
+│       ├── store/     # Redux Toolkit slices (client state only)
+│       ├── features/  # auth, theme — logic grouped by domain
+│       ├── components/# layout and shared UI
+│       └── pages/     # route-level screens
 ├── docker/            # docker-compose.yml, Dockerfiles
 ├── docs/              # architecture diagram, ADRs
 └── README.md
@@ -40,8 +46,8 @@ Everything after that is built incrementally while the project is already live.
 ### Phase 0 — Setup
 
 - [x] Create repository and folder structure: `backend`, `frontend`, `docker`
-- [ ] Design the database schema: `User`, `Application`, `Company`, `StatusHistory`, `Note`
-- [ ] Draft this README (keep it updated as the project grows, not at the end)
+- [x] Design the database schema: `User`, `Application`, `Company`, `StatusHistory`, `Note` — see `docs/schema.md`
+- [x] Draft this README (keep it updated as the project grows, not at the end)
 - [x] Configure `.editorconfig`, `.gitignore` files, and a commit convention
 
 ### Phase 1 — Backend Skeleton
@@ -63,14 +69,15 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 3 — Frontend Skeleton
 
-- [ ] Vite + React + TypeScript in strict mode
-- [ ] Axios instance with token interceptor and automatic refresh
-- [ ] Login and registration pages, protected routes
-- [ ] App layout: sidebar, header, light/dark theme
+- [x] Vite + React + TypeScript in strict mode
+- [x] Redux Toolkit store for client state: `auth`, `theme`, `ui` slices with typed hooks
+- [x] Axios instance with token interceptor and automatic refresh
+- [x] Login and registration pages, protected routes
+- [x] App layout: sidebar, header, light/dark theme
 
 ### Phase 4 — List and Form
 
-- [ ] Applications table with TanStack Table: sorting, filtering by status and company
+- [ ] Applications table with TanStack Table: sorting, filtering by status and company (filter state in `uiSlice`)
 - [ ] Row virtualization for large datasets
 - [ ] **Schema-driven form engine**: JSON schema → rendered form
   - [ ] Field type registry: `text`, `textarea`, `select`, `date`, `money`, `tags`
@@ -141,12 +148,18 @@ cd frontend && npm install && npm run dev
 Frontend: http://localhost:5173
 Swagger: http://localhost:8080/swagger-ui.html
 
+The frontend reads the API base URL from `VITE_API_URL`. `frontend/.env` already points at
+`http://localhost:8080`; copy `frontend/.env.example` to `frontend/.env.local` to override it.
+
+Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `build`.
+
 ---
 
 ## Architecture Decisions
 
 _(filled in as the project progresses — one short section per non-trivial decision)_
 
+- **Redux Toolkit for client state, TanStack Query for server state** — Redux owns auth, theme, and UI state; anything that lives on the server stays in the query cache instead of being mirrored into a slice
 - **Schema-driven form engine instead of hand-written forms** — the reasoning and where the abstraction stops paying off
 - **Custom date picker instead of a library** — which accessibility requirements drove it
 - **Optimistic updates on the Kanban board** — how conflicts are resolved

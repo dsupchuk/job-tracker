@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+/* Theme is driven by a `dark` class on <html>, set from the Redux themeSlice. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-brand: var(--brand);
+  --color-brand-contrast: var(--brand-contrast);
+}
+
+:root {
+  --surface: oklch(100% 0 0);
+  --surface-muted: oklch(97% 0.004 260);
+  --border-subtle: oklch(91% 0.006 260);
+  --content: oklch(22% 0.01 260);
+  --content-muted: oklch(52% 0.014 260);
+  --brand: oklch(55% 0.17 262);
+  --brand-contrast: oklch(99% 0 0);
+}
+
+.dark {
+  --surface: oklch(19% 0.012 260);
+  --surface-muted: oklch(24% 0.014 260);
+  --border-subtle: oklch(32% 0.016 260);
+  --content: oklch(96% 0.004 260);
+  --content-muted: oklch(72% 0.012 260);
+  --brand: oklch(70% 0.14 262);
+  --brand-contrast: oklch(18% 0.012 260);
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-surface text-content antialiased;
+}
+
+/* Every interactive element keeps a visible focus ring — Phase 6 depends on it. */
+:focus-visible {
+  @apply outline-brand outline-2 outline-offset-2;
+}

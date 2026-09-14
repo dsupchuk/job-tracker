@@ -1,0 +1,12 @@
+import { Link } from 'react-router-dom'
+
+export function NotFoundPage() {
+  return (
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-2">
+      <h1 className="text-content text-lg font-semibold">Page not found</h1>
+      <Link to="/applications" className="text-brand text-sm underline underline-offset-4">
+        Back to applications
+      </Link>
+    </main>
+  )
+}
