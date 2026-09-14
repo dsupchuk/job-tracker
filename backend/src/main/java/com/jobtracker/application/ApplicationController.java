@@ -2,8 +2,11 @@ package com.jobtracker.application;
 
 import com.jobtracker.application.dto.ApplicationRequest;
 import com.jobtracker.application.dto.ApplicationResponse;
+import com.jobtracker.application.dto.StatusChangeRequest;
+import com.jobtracker.application.dto.StatusHistoryResponse;
 import com.jobtracker.user.User;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,6 +58,19 @@ public class ApplicationController {
     public ApplicationResponse update(@AuthenticationPrincipal User user, @PathVariable Long id,
                                       @Valid @RequestBody ApplicationRequest request) {
         return service.update(user.getId(), id, request);
+    }
+
+    /** What a Kanban drop calls — a status move, not a full replacement. */
+    @PatchMapping("/{id}/status")
+    public ApplicationResponse changeStatus(@AuthenticationPrincipal User user, @PathVariable Long id,
+                                            @Valid @RequestBody StatusChangeRequest request) {
+        return service.changeStatus(user.getId(), id, request.status());
+    }
+
+    @GetMapping("/{id}/history")
+    public List<StatusHistoryResponse> history(@AuthenticationPrincipal User user,
+                                               @PathVariable Long id) {
+        return service.history(user.getId(), id);
     }
 
     @DeleteMapping("/{id}")

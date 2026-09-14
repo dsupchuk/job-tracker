@@ -31,6 +31,9 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_PATHS = {
             "/api/auth/**",
+            // Spring forwards to /error to render unhandled failures; blocking it
+            // would rewrite every such response as a misleading 401.
+            "/error",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",

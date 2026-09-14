@@ -1,5 +1,12 @@
 import { apiClient } from './client'
-import type { Application, ApplicationRequest, Page, PageParams } from './types'
+import type {
+  Application,
+  ApplicationRequest,
+  ApplicationStatus,
+  Page,
+  PageParams,
+  StatusHistoryEntry,
+} from './types'
 
 const BASE = '/api/applications'
 
@@ -49,10 +56,25 @@ export async function deleteApplication(id: number): Promise<void> {
   await apiClient.delete(`${BASE}/${id}`)
 }
 
+/** Moves an application to a new status — what a Kanban drop sends. */
+export async function changeApplicationStatus(
+  id: number,
+  status: ApplicationStatus,
+): Promise<Application> {
+  const { data } = await apiClient.patch<Application>(`${BASE}/${id}/status`, { status })
+  return data
+}
+
+export async function getStatusHistory(id: number): Promise<StatusHistoryEntry[]> {
+  const { data } = await apiClient.get<StatusHistoryEntry[]>(`${BASE}/${id}/history`)
+  return data
+}
+
 /** Query keys are centralised so cache invalidation stays consistent. */
 export const applicationKeys = {
   all: ['applications'] as const,
   list: (params: PageParams) => ['applications', 'list', params] as const,
   listAll: () => ['applications', 'list', 'all'] as const,
   detail: (id: number) => ['applications', 'detail', id] as const,
+  history: (id: number) => ['applications', 'history', id] as const,
 }

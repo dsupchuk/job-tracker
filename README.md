@@ -57,7 +57,7 @@ Everything after that is built incrementally while the project is already live.
 - [x] Flyway migration `V1__init.sql`: `users` and `applications` tables
 - [x] Entity → Repository → Service → Controller for `Application` (CRUD)
 - [x] DTOs with MapStruct mappers — no entities exposed through the API
-- [x] Global `@RestControllerAdvice` with a consistent error response format
+- [x] Global `@RestControllerAdvice` with a consistent error response format, covering Spring MVC's own exceptions (`ErrorContractTest`)
 - [x] `applications.company` as a denormalized column (`V3`), split out of the position string
 - [x] Swagger UI via springdoc-openapi
 
@@ -90,11 +90,11 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 5 — Kanban and Drag & Drop
 
-- [ ] Columns: Applied → Screening → Interview → Offer / Rejected
-- [ ] Card dragging with dnd-kit
-- [ ] Optimistic updates with rollback on failure
-- [ ] `StatusHistory` entry written on every status change
-- [ ] Full keyboard navigation across cards and columns
+- [x] Columns: Saved → Applied → Screening → Interview → Offer / Rejected, with count and total per column
+- [x] Card dragging with dnd-kit, `PATCH /api/applications/{id}/status`
+- [x] Optimistic updates with rollback on failure
+- [x] `status_history` entry written on every status change (`V4`), shown as a card timeline
+- [x] Full keyboard navigation across cards and columns, with screen-reader announcements
 
 ### Phase 6 — Accessibility
 
@@ -164,7 +164,9 @@ _(filled in as the project progresses — one short section per non-trivial deci
 - **Redux Toolkit for client state, TanStack Query for server state** — Redux owns auth, theme, and UI state; anything that lives on the server stays in the query cache instead of being mirrored into a slice
 - **Schema-driven form engine instead of hand-written forms** — field types come from a registry and validation is generated from the same schema, so a new field is one registry entry plus one schema line; see `docs/adr/0003-form-engine-and-table.md`
 - **Custom date picker instead of a library** — which accessibility requirements drove it
-- **Optimistic updates on the Kanban board** — how conflicts are resolved
+- **Optimistic updates on the Kanban board** — the cache moves first and is restored from the pre-move snapshot if the request fails
+- **Board keyboard model** — left/right jump columns, which dnd-kit's default coordinate getter cannot express; see `docs/adr/0004-kanban-board.md`
+- **Card order is derived, not stored** — columns sort by how long an application has been waiting, so the board never offers a reorder it cannot persist
 - **Testcontainers instead of H2** — why real PostgreSQL behaviour matters
 
 ---

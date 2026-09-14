@@ -185,7 +185,7 @@ This document describes the **target** design. It is built incrementally through
 | `applications.user_id` (ownership FK) | `V2__users_auth.sql` | ✅ implemented |
 | `applications.company` (denormalized text) | `V3__application_company.sql` | ✅ implemented |
 | `companies`, `applications.company_id` | later phase | ⏳ planned |
-| `status_history` | Phase 5 | ⏳ planned |
+| `status_history` | `V4__status_history.sql` | ✅ implemented |
 | `notes` | later phase | ⏳ planned |
 
 Ownership is enforced: every application belongs to a user (`applications.user_id`, FK → `users`, `ON DELETE CASCADE`), and the API filters every query by the authenticated user, returning `404` for other users' rows.

@@ -2,6 +2,7 @@ package com.jobtracker.application;
 
 import com.jobtracker.application.dto.ApplicationRequest;
 import com.jobtracker.application.dto.ApplicationResponse;
+import com.jobtracker.application.dto.StatusHistoryResponse;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,6 +16,8 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface ApplicationMapper {
 
     ApplicationResponse toResponse(Application application);
+
+    StatusHistoryResponse toResponse(StatusHistory entry);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

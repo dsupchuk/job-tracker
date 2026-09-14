@@ -56,6 +56,14 @@ export type PageParams = {
   sort?: string
 }
 
+export type StatusHistoryEntry = {
+  id: number
+  /** Null for the opening entry written when the application is created. */
+  fromStatus: ApplicationStatus | null
+  toStatus: ApplicationStatus
+  changedAt: string
+}
+
 export type AuthResponse = {
   accessToken: string
   refreshToken: string
