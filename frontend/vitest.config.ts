@@ -15,5 +15,13 @@ export default defineConfig({
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // The Axios client builds its baseURL from this; MSW handlers match on it.
+    env: { VITE_API_URL: 'http://localhost:8080' },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text-summary', 'lcov'],
+      // Config, entry points and type-only files carry no logic to cover.
+      exclude: ['src/main.tsx', 'src/test/**', 'src/**/*.d.ts', '**/*.config.*', 'dist/**'],
+    },
   },
 })

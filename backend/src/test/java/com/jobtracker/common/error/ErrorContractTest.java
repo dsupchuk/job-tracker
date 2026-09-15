@@ -7,18 +7,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jayway.jsonpath.JsonPath;
-import com.jobtracker.user.UserRepository;
-import java.util.UUID;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import com.jobtracker.support.IntegrationTest;
+import com.jobtracker.support.TestAccounts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-// Spring Boot 4 moved this out of `boot.test.autoconfigure.web.servlet`.
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,58 +22,19 @@ import org.springframework.test.web.servlet.MockMvc;
  * that the security chain rejected — making every client mistake look like an
  * expired token to the frontend, which answered by refreshing and retrying.
  */
-@SpringBootTest
-@AutoConfigureMockMvc
-// PER_CLASS so the throwaway account can be cleaned up in a non-static @AfterAll.
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ErrorContractTest {
+class ErrorContractTest extends IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepository;
+    private String bearer;
 
-    private static String accessToken;
-    private static String registeredEmail;
-
-    @BeforeAll
-    static void resetToken() {
-        accessToken = null;
-        registeredEmail = null;
-    }
-
-    /** The dev database is the developer's own — leave no throwaway accounts in it. */
-    @AfterAll
-    void removeThrowawayAccount() {
-        if (registeredEmail != null) {
-            userRepository.findByEmail(registeredEmail).ifPresent(userRepository::delete);
-        }
-    }
-
-    /** Registers a throwaway account so the test never collides with seed data. */
-    private String token() throws Exception {
-        if (accessToken != null) {
-            return accessToken;
-        }
-        registeredEmail = "error-contract-" + UUID.randomUUID() + "@example.com";
-        String body = """
-                {"email":"%s","password":"secret"}""".formatted(registeredEmail);
-
-        String response = mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-
-        accessToken = JsonPath.read(response, "$.accessToken");
-        return accessToken;
-    }
-
+    /** A fresh account owns nothing, which several of these cases rely on. */
     private String bearer() throws Exception {
-        return "Bearer " + token();
+        if (bearer == null) {
+            bearer = TestAccounts.register(mockMvc).bearer();
+        }
+        return bearer;
     }
 
     @Test
@@ -155,10 +109,9 @@ class ErrorContractTest {
     }
 
     @Test
-    @DisplayName("another user's application is a 404, so ids cannot be enumerated")
-    void foreignApplicationIsNotFound() throws Exception {
-        // The fresh account owns nothing, so every seeded id is "not found".
-        mockMvc.perform(get("/api/applications/1").header("Authorization", bearer()))
+    @DisplayName("an application that does not exist is a 404")
+    void missingApplicationIsNotFound() throws Exception {
+        mockMvc.perform(get("/api/applications/999999").header("Authorization", bearer()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
     }
@@ -166,9 +119,12 @@ class ErrorContractTest {
     @Test
     @DisplayName("bad credentials are reported as such")
     void badCredentials() throws Exception {
+        String email = TestAccounts.register(mockMvc).email();
+
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"demo@demo.com\",\"password\":\"definitely-wrong\"}"))
+                        .content("""
+                                {"email":"%s","password":"definitely-wrong"}""".formatted(email)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
     }

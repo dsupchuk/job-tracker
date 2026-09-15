@@ -1,0 +1,11 @@
+# The backend image copies from the repository root, so keep everything it does
+# not need out of the build context.
+.git
+.github
+.idea
+docs
+frontend
+backend/target
+**/node_modules
+**/dist
+*.md

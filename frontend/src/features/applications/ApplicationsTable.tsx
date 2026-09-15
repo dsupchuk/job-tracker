@@ -27,6 +27,10 @@ export function ApplicationsTable({ table }: ApplicationsTableProps) {
   const rows = table.getRowModel().rows
 
   const scrollRef = useRef<HTMLDivElement>(null)
+  // Known lint warning: `useVirtualizer` hands back functions, so React Compiler
+  // skips memoizing this component. Not actionable without dropping
+  // virtualisation — but note that a bail-out also suppresses other react-hooks
+  // rules in this file, so changes here do not get their usual checking.
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,

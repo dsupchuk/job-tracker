@@ -1,5 +1,7 @@
 # Job Application Tracker
 
+[![CI](https://github.com/dsupchuk/job-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/dsupchuk/job-tracker/actions/workflows/ci.yml)
+
 A full-stack tool for tracking job applications: Kanban board, funnel analytics, and automatic job posting parsing from a URL.
 
 **Live demo:** _(add after Phase 8)_
@@ -105,10 +107,13 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 7 — Testing and CI
 
-- [ ] Backend: JUnit 5 + Testcontainers (real PostgreSQL), covering services and the auth flow
-- [ ] Frontend: Vitest + RTL for the form engine and Kanban board, MSW for API mocking
-- [ ] GitHub Actions pipeline: `lint → test → build → docker build`
-- [ ] Build and coverage badges in this README
+- [x] Backend: JUnit 5 + Testcontainers (real PostgreSQL) for the auth flow, ownership and the error contract
+- [x] Backend: Mockito unit tests for the rules that need no database
+- [x] Frontend: Vitest + RTL for the form engine, board, date picker and accessibility
+- [x] Frontend: MSW for the auth interceptor — 401 → refresh → replay, exercised over real HTTP
+- [x] GitHub Actions pipeline: `lint → format → typecheck → test → build`, plus a docker build on `main`
+- [x] Coverage reporting on both sides (`vitest --coverage`, JaCoCo)
+- [ ] Branch protection on `main` — a GitHub repository setting, not a file in this repo
 
 ### Phase 8 — Deployment
 
@@ -153,7 +158,26 @@ Swagger: http://localhost:8080/swagger-ui.html
 The frontend reads the API base URL from `VITE_API_URL`. `frontend/.env` already points at
 `http://localhost:8080`; copy `frontend/.env.example` to `frontend/.env.local` to override it.
 
-Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `test`, `build`.
+Frontend scripts: `npm run dev`, `lint`, `format`, `typecheck`, `test`, `test:coverage`, `build`.
+
+---
+
+## Tests
+
+```bash
+cd frontend && npm run test     # 101 tests
+cd backend  && ./mvnw verify    # 24 tests, starts its own PostgreSQL
+```
+
+Backend integration tests run against a real PostgreSQL started by Testcontainers, so they
+need a running Docker daemon and never touch your local database.
+
+Coverage reports land in `frontend/coverage` and `backend/target/site/jacoco`:
+
+| | Lines | Branches |
+|---|---|---|
+| Frontend | 73.9% | 65.1% |
+| Backend | 71.6% | 48.2% |
 
 ---
 
@@ -168,7 +192,7 @@ _(filled in as the project progresses — one short section per non-trivial deci
 - **Board keyboard model** — left/right jump columns, which dnd-kit's default coordinate getter cannot express; see `docs/adr/0004-kanban-board.md`
 - **Card order is derived, not stored** — columns sort by how long an application has been waiting, so the board never offers a reorder it cannot persist
 - **Time is the loudest signal, colour is earned** — the funnel is drawn as an ordered position rather than six colour chips, and brass marks only an offer; see `docs/adr/0005-visual-system.md`
-- **Testcontainers instead of H2** — why real PostgreSQL behaviour matters
+- **Testcontainers instead of H2** — the schema uses split_part, identity columns and TIMESTAMPTZ; a suite passing on a database you do not ship is worth little. See docs/adr/0006-testing-strategy.md
 
 ---
 

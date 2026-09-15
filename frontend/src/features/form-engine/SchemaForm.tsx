@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { Controller, useForm, type Control, type Resolver } from 'react-hook-form'
+import { Controller, useForm, useWatch, type Control, type Resolver } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { buildZodSchema } from './buildZodSchema'
 import { fieldRegistry } from './fieldRegistry'
@@ -105,8 +105,12 @@ export function SchemaForm({
   const fields = useMemo(() => allFields(schema), [schema])
 
   // Read through a ref so the resolver identity stays stable across renders.
+  // Written in an effect, never during render — validation only runs in response
+  // to interaction, by which time the effect has long since landed.
   const contextRef = useRef(validationContext)
-  contextRef.current = validationContext
+  useEffect(() => {
+    contextRef.current = validationContext
+  }, [validationContext])
 
   /**
    * The schema is rebuilt per validation run from the fields visible for the
@@ -124,7 +128,9 @@ export function SchemaForm({
   )
 
   const form = useForm<FormValues>({ defaultValues, resolver, mode: 'onTouched' })
-  const values = form.watch()
+  // `useWatch` rather than `form.watch()`: it subscribes through the control
+  // instead of handing back a function, which keeps the component memoizable.
+  const values: FormValues = useWatch({ control: form.control })
 
   const hiddenNames = fields
     .filter((field) => !isFieldVisible(field, values))
@@ -147,14 +153,17 @@ export function SchemaForm({
     .map((field) => `${field.name}:${field.revalidateOn?.map((dep) => String(values[dep])).join()}`)
     .join('|')
 
-  const staleErrors = useRef<string[]>([])
-  staleErrors.current = fields
+  // Read during render so the formState proxy actually subscribes; joined into
+  // a string so the effect keys on the contents rather than array identity.
+  const staleKey = fields
     .filter((field) => field.revalidateOn?.length && form.formState.errors[field.name])
     .map((field) => field.name)
+    .join('|')
 
   useEffect(() => {
-    if (staleErrors.current.length > 0) void form.trigger(staleErrors.current)
-  }, [revalidationKey, form])
+    if (staleKey === '') return
+    void form.trigger(staleKey.split('|'))
+  }, [revalidationKey, staleKey, form])
 
   const isWizard = schema.mode === 'wizard' && schema.steps.length > 1
   const [stepIndex, setStepIndex] = useState(0)

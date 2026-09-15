@@ -17,7 +17,9 @@ function initialTheme(): Theme {
 
 const themeSlice = createSlice({
   name: 'theme',
-  initialState: { mode: initialTheme() },
+  // Lazy for the same reason as `authSlice`: a store reflects storage when it
+  // is created, not when this module happened to load.
+  initialState: () => ({ mode: initialTheme() }),
   reducers: {
     themeSet(state, action: PayloadAction<Theme>) {
       state.mode = action.payload

@@ -24,13 +24,20 @@ export type AuthState = {
   status: AuthStatus
 }
 
-const storedRefreshToken = readStored(REFRESH_TOKEN_KEY)
-
-const initialState: AuthState = {
-  accessToken: null,
-  refreshToken: storedRefreshToken,
-  user: null,
-  status: storedRefreshToken ? 'bootstrapping' : 'anonymous',
+/**
+ * Read lazily, per store, rather than once when this module is first imported.
+ * `createStore()` should reflect what storage holds at the moment it is called —
+ * anything else makes the initial state impossible to set up in a test, and
+ * quietly wrong for any second store.
+ */
+function initialState(): AuthState {
+  const storedRefreshToken = readStored(REFRESH_TOKEN_KEY)
+  return {
+    accessToken: null,
+    refreshToken: storedRefreshToken,
+    user: null,
+    status: storedRefreshToken ? 'bootstrapping' : 'anonymous',
+  }
 }
 
 export type Credentials = {
