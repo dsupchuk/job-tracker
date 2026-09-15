@@ -4,8 +4,8 @@
 
 A full-stack tool for tracking job applications: Kanban board, funnel analytics, and automatic job posting parsing from a URL.
 
-**Live demo:** _(add after Phase 8)_
-**Demo account:** `demo@demo.com` / `demo`
+**Live demo:** _(not deployed yet — see `docs/deployment.md`)_
+**Demo account:** `demo@demo.com` / `demo`, or press **Try the demo** on the sign-in page
 
 ---
 
@@ -33,7 +33,7 @@ job-tracker/
 │       ├── features/  # auth, theme, applications, form-engine — grouped by domain
 │       ├── components/# layout and shared UI
 │       └── pages/     # route-level screens
-├── docker/            # docker-compose.yml, Dockerfiles
+├── docker/            # docker-compose.yml, backend.Dockerfile
 ├── docs/              # architecture diagram, ADRs
 └── README.md
 ```
@@ -117,10 +117,12 @@ Everything after that is built incrementally while the project is already live.
 
 ### Phase 8 — Deployment
 
-- [ ] Frontend → Vercel
-- [ ] Backend → Railway or Render
-- [ ] Database → Neon
-- [ ] CORS configuration, environment variables, `/actuator/health`
+- [x] Deployment configuration: `render.yaml`, `frontend/vercel.json`, multi-stage `docker/backend.Dockerfile`
+- [x] `/actuator/health` exposed and public; every other actuator endpoint stays shut
+- [x] Environment-driven CORS, datasource and JWT secret — nothing deployment-specific in git
+- [x] Demo seeding and nightly reset, switched by properties and covered by `DemoDataTest`
+- [x] Runbook: `docs/deployment.md`
+- [ ] Create the Neon, Render and Vercel accounts and deploy (needs your credentials)
 - [ ] Screenshots and live demo link added to this README
 
 ### Phase 9 — Extensions

@@ -1,0 +1,4 @@
+# Local development. The demo account is what you log in as while building.
+app:
+  demo:
+    seed: true

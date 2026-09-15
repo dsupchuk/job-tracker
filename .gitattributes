@@ -1,0 +1,20 @@
+# Normalise line endings in the repository regardless of who commits from where.
+* text=auto eol=lf
+
+# Windows-only scripts genuinely want CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# The Maven wrapper is executed by /bin/sh on CI. CRLF here fails with a
+# confusing "bad interpreter" rather than anything about line endings.
+mvnw text eol=lf
+
+# Binary: never touch these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.jar binary

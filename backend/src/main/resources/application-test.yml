@@ -1,0 +1,9 @@
+# Integration tests create the data they assert on, so nothing is seeded for them.
+app:
+  demo:
+    seed: false
+
+# Flyway still runs: the migrations are part of what these tests verify.
+logging:
+  level:
+    org.hibernate.SQL: warn

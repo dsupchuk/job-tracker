@@ -1,0 +1,43 @@
+# Render blueprint for the backend. Point Render at this repository and it reads
+# this file; the values marked `sync: false` are entered once in the dashboard
+# and never live in git.
+#
+# The database is Neon rather than a Render Postgres — see docs/deployment.md.
+
+services:
+  - type: web
+    name: jobtracker-api
+    runtime: docker
+    dockerfilePath: ./docker/backend.Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+
+    # Render polls this until it answers before routing traffic to a new deploy.
+    healthCheckPath: /actuator/health
+
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Neon connection string, including ?sslmode=require
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+
+      # At least 32 bytes for HS256. Changing it signs every session out.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # The deployed frontend's origin. Comma-separated if there is more than one.
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+
+      # The public demo wants its sample data, and wants it cleaned nightly.
+      - key: APP_DEMO_SEED
+        value: "true"
+      - key: APP_DEMO_RESET_CRON
+        value: "0 0 3 * * *"

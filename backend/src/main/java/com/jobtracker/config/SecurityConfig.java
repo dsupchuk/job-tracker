@@ -34,6 +34,9 @@ public class SecurityConfig {
             // Spring forwards to /error to render unhandled failures; blocking it
             // would rewrite every such response as a misleading 401.
             "/error",
+            // The hosting platform polls this before it has any credentials.
+            "/actuator/health",
+            "/actuator/health/**",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",
